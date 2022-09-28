@@ -18,5 +18,5 @@ config['REDIS'] = {
     'password': 'YOUR_PASSWORD_HERE'
 }
 
-with open('../config.ini', 'w') as configfile:
+with open('config.ini', 'w') as configfile:
     config.write(configfile)
