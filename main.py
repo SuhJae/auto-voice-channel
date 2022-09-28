@@ -7,9 +7,17 @@ import configparser
 config = configparser.ConfigParser()
 config.read('config.ini')
 
-print(config['CREDENTIALS']['token'])
+token = config['CREDENTIALS']['token']
+owner_id = config['CREDENTIALS']['owner_id']
 
+prefix = config['SETTINGS']['prefix']
+status = config['SETTINGS']['status']
+status_message = config['SETTINGS']['status_message']
+status_type = config['SETTINGS']['status_type']
 
+host = config['REDIS']['host']
+port = config['REDIS']['port']
+password = config['REDIS']['password']
 
 #discord setup
 intents = nextcord.Intents.default()
