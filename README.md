@@ -4,12 +4,10 @@ This project is in development, but it is still usable.
 This is a Discord bot that will allow users to create auto voice channels, so when the user joins the auto voice channel, the bot will automatically generate a voice channel for them.
 This project uses Redis to store data, so it is blazing fast and filly scalable using shards in the future.
 
----
 ## Requirments
 Redis server
 Python packages: Redis, nextcord
 
----
 ## Setup
 1. Go to https://discord.com/developers/applications and create an application.
 2. Press the bot on the left menu and the "activate bot" button.
