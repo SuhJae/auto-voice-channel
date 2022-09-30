@@ -30,3 +30,5 @@ Python packages: Redis, nextcord
 /create `channel` - Sets channel as an automatic voice channel.
 
 /delete `channel` - Deactivates auto voice channel, so it no longer makes a channel when a user joins.
+
+/list - View all acvive automatic voice channel.
