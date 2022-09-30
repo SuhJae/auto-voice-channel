@@ -33,3 +33,5 @@ Python packages: Redis, nextcord
 /delete `channel` - Deactivates auto voice channel, so it no longer makes a channel when a user joins.
 
 /list - View all acvive automatic voice channel.
+
+/clear - Delets all channels created by the bot. (In case of the bot going offline for a bit)
