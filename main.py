@@ -95,7 +95,9 @@ async def on_ready():
     print('======================================')
 
 
-@client.slash_command(name=lang['CREATE']['name'], description=lang['CREATE']['description'], dm_permission=False, default_member_permissions=8)
+# create command
+@client.slash_command(name=lang['CREATE']['name'], description=lang['CREATE']['description'], dm_permission=False,
+                      default_member_permissions=8)
 async def create_intro(interaction: Interaction,
                        channel: nextcord.VoiceChannel = nextcord.SlashOption(
                            description=lang['CREATE']['argument_description'],
@@ -104,35 +106,81 @@ async def create_intro(interaction: Interaction,
                        ):
     try:
         if r.exists(f"auto:{channel.guild.id}:{channel.id}"):
-            embed = nextcord.Embed(title=lang['CREATE']['duplicate'], description=lang['CREATE']['duplicate_description'], color=nextcord.Color.yellow())
+            embed = nextcord.Embed(title=lang['CREATE']['duplicate'],
+                                   description=lang['CREATE']['duplicate_description'], color=nextcord.Color.yellow())
             await interaction.response.send_message(embed=embed, ephemeral=True)
         else:
             r.set(f"auto:{channel.guild.id}:{channel.id}", channel.category.id)
-            embed = nextcord.Embed(title=lang['CREATE']['success'], description=lang['CREATE']['success_description'].format(channel.mention), color=nextcord.Color.green())
+            embed = nextcord.Embed(title=lang['CREATE']['success'],
+                                   description=lang['CREATE']['success_description'].format(channel.mention),
+                                   color=nextcord.Color.green())
             await interaction.response.send_message(embed=embed, ephemeral=True)
 
     except:
-        embed = nextcord.Embed(title=lang['CREATE']['error'], description=lang['CREATE']['error_description'],color=nextcord.Color.red())
+        embed = nextcord.Embed(title=lang['CREATE']['error'], description=lang['CREATE']['error_description'],
+                               color=nextcord.Color.red())
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
-@client.slash_command(name=lang['DELETE']['name'], description=lang['DELETE']['description'], dm_permission=False, default_member_permissions=8)
+
+# deactive command
+@client.slash_command(name=lang['DELETE']['name'], description=lang['DELETE']['description'], dm_permission=False,
+                      default_member_permissions=8)
 async def delete_intro(interaction: Interaction,
-                          channel: nextcord.VoiceChannel = nextcord.SlashOption(
-                                description=lang['DELETE']['argument_description'],
-                                required=True,
-                            ),
-                            ):
+                       channel: nextcord.VoiceChannel = nextcord.SlashOption(
+                           description=lang['DELETE']['argument_description'],
+                           required=True,
+                       ),
+                       ):
     try:
         if r.exists(f"auto:{channel.guild.id}:{channel.id}"):
             r.delete(f"auto:{channel.guild.id}:{channel.id}")
-            embed = nextcord.Embed(title=lang['DELETE']['success'], description=lang['DELETE']['success_description'].format(channel.mention), color=nextcord.Color.green())
+            embed = nextcord.Embed(title=lang['DELETE']['success'],
+                                   description=lang['DELETE']['success_description'].format(channel.mention),
+                                   color=nextcord.Color.green())
             await interaction.response.send_message(embed=embed, ephemeral=True)
         else:
-            embed = nextcord.Embed(title=lang['DELETE']['not_found'], description=lang['DELETE']['not_found_description'], color=nextcord.Color.yellow())
+            embed = nextcord.Embed(title=lang['DELETE']['not_found'],
+                                   description=lang['DELETE']['not_found_description'], color=nextcord.Color.yellow())
             await interaction.response.send_message(embed=embed, ephemeral=True)
     except:
-        embed = nextcord.Embed(title=lang['DELETE']['error'], description=lang['DELETE']['error_description'],color=nextcord.Color.red())
+        embed = nextcord.Embed(title=lang['DELETE']['error'], description=lang['DELETE']['error_description'],
+                               color=nextcord.Color.red())
         await interaction.response.send_message(embed=embed, ephemeral=True)
+
+
+# list command
+@client.slash_command(name=lang['LIST']['name'], description=lang['LIST']['description'], dm_permission=False)
+async def list_intro(interaction: Interaction):
+    try:
+        keys = r.keys(f"auto:{interaction.guild.id}:*")
+        if len(keys) == 0:
+            embed = nextcord.Embed(title=lang['LIST']['empty'],
+                                   description=lang['LIST']['empty_description'].format(interaction.guild.name),
+                                   color=nextcord.Color.yellow())
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+        else:
+            embed = nextcord.Embed(title=lang['LIST']['loading'],
+                                   description=lang['LIST']['loading_description'].format(len(keys), interaction.guild.name,
+                                                                                          len(keys)),
+                                   color=nextcord.Color.blue())
+            output = await interaction.response.send_message(embed=embed, ephemeral=True)
+
+            embed = nextcord.Embed(title=lang['LIST']['embed_title'],
+                                   description=lang['LIST']['embed_description'].format(len(keys), interaction.guild.name),
+                                   color=nextcord.Color.green())
+            value = ""
+
+            for num, key in enumerate(keys):
+                channel = await client.fetch_channel(int(key.split(":")[2]))
+                value = f"{value}\n`{num + 1}`  {channel.mention}"
+
+            embed.add_field(name=lang['LIST']['embed_field_name'], value=value, inline=False)
+            await output.edit(embed=embed)
+
+    except:
+        embed = nextcord.Embed(title=lang['LIST']['error'], description=lang['LIST']['error_description'],color=nextcord.Color.red())
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+
 
 # on user joining/leaving voice channel
 @client.event
@@ -148,5 +196,6 @@ async def on_voice_state_update(member, before, after):
             new_channel = await after.channel.guild.create_voice_channel(name=member.display_name, category=category)
             await member.move_to(new_channel)
             r.set(f"temp:{after.channel.guild.id}:{new_channel.id}", member.id)
+
 
 client.run(token)
