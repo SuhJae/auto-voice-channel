@@ -188,21 +188,45 @@ async def list_intro(interaction: Interaction):
         embed = nextcord.Embed(title=lang['LIST']['error'], description=lang['LIST']['error_description'],color=nextcord.Color.red())
         await output.edit(embed=embed)
 
-#clear command
-# @client.slash_command(name=lang['CLEAR']['name'], description=lang['CLEAR']['description'], dm_permission=False, default_member_permissions=8)
-# #selection menu
-# async def clear(interaction: Interaction):
-#     keys = r.keys(f"temp:{interaction.guild.id}:*")
-#     if len(keys) == 0:
-#         embed = nextcord.Embed(title=lang['CLEAR']['empty'],
-#                                description=lang['CLEAR']['empty_description'].format(interaction.guild.name),
-#                                color=nextcord.Color.yellow())
-#         await interaction.response.send_message(embed=embed, ephemeral=True)
-#     else:
-#         embed = nextcord.Embed(title=lang['CLEAR']['loading'],
-#                                description=lang['CLEAR']['loading_description'].format(len(keys), len(keys)),
-#                                color=nextcord.Color.blue())
-#         output = await interaction.response.send_message(embed=embed, ephemeral=True)
+# clear command
+@client.slash_command(name=lang['CLEAR']['name'], description=lang['CLEAR']['description'], dm_permission=False, default_member_permissions=8)
+#selection menu
+async def clear(interaction: Interaction):
+    keys = r.keys(f"temp:{interaction.guild.id}:*")
+    if len(keys) == 0:
+        embed = nextcord.Embed(title=lang['CLEAR']['empty'],
+                               description=lang['CLEAR']['empty_description'].format(interaction.guild.name),
+                               color=nextcord.Color.yellow())
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+    else:
+        embed = nextcord.Embed(title=lang['CLEAR']['loading'],
+                               description=lang['CLEAR']['loading_description'].format(len(keys), len(keys)),
+                               color=nextcord.Color.blue())
+        output = await interaction.response.send_message(embed=embed, ephemeral=True)
+        error_count = 0
+
+        for key in keys:
+            r.delete(key)
+            try:
+                channel = await client.fetch_channel(int(key.split(":")[2]))
+                await channel.delete()
+            except:
+                error_count += 1
+
+        if error_count == 0:
+            embed = nextcord.Embed(title=lang['CLEAR']['success'],
+                                   description=lang['CLEAR']['success_description'].format(len(keys)),
+                                   color=nextcord.Color.green())
+        elif error_count == len(keys):
+            embed = nextcord.Embed(title=lang['CLEAR']['failure'],
+                                   description=lang['CLEAR']['failure_description'].format(len(keys)),
+                                   color=nextcord.Color.red())
+        else:
+            embed = nextcord.Embed(title=lang['CLEAR']['partial'],
+                                   description=lang['CLEAR']['partial_description'].format(len(keys), error_count),
+                                   color=nextcord.Color.yellow())
+        await output.edit(embed=embed)
+
 
 
 # on user joining/leaving voice channel
