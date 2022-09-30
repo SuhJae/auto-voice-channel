@@ -7,6 +7,7 @@ This project uses Redis to store data, so it is swift and fully scalable using s
 
 ## Requirments
 Redis server
+
 Python packages: Redis, nextcord
 
 ## Setup
