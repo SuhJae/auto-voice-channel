@@ -170,16 +170,23 @@ async def list_intro(interaction: Interaction):
                                    color=nextcord.Color.green())
             value = ""
 
+            del_count = 0
             for num, key in enumerate(keys):
-                channel = await client.fetch_channel(int(key.split(":")[2]))
-                value = f"{value}\n`{num + 1}`  {channel.mention}"
+                try:
+                    channel = await client.fetch_channel(int(key.split(":")[2]))
+                    value = f"{value}\n`{num + 1}`  {channel.mention}"
+                except:
+                    r.delete(key)
+                    del_count += 1
 
             embed.add_field(name=lang['LIST']['embed_field_name'], value=value, inline=False)
+            if del_count > 0:
+                embed.set_footer(text=lang['LIST']['embed_footer'].format(del_count))
             await output.edit(embed=embed)
 
     except:
         embed = nextcord.Embed(title=lang['LIST']['error'], description=lang['LIST']['error_description'],color=nextcord.Color.red())
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        await output.edit(embed=embed)
 
 
 # on user joining/leaving voice channel
@@ -197,5 +204,10 @@ async def on_voice_state_update(member, before, after):
             await member.move_to(new_channel)
             r.set(f"temp:{after.channel.guild.id}:{new_channel.id}", member.id)
 
+#when voice channel is deleted
+@client.event
+async def on_guild_channel_delete(channel):
+    if r.get(f"auto:{channel.guild.id}:{channel.id}") != None:
+        r.delete(f"auto:{channel.guild.id}:{channel.id}")
 
 client.run(token)
