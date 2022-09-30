@@ -40,5 +40,19 @@ config['LIST'] = {
     'empty_description': 'There are no automatic voice channels in **{0}**!',
     'embed_footer': 'There are {0} deleted channels which were removed from our database.'
 }
+
+config['CLEAR'] = {
+    'name': 'clear',
+    'description': 'Removes all voice channels created by the bot',
+    'success': 'Success!',
+    'success_description': 'All voice channels created by the bot have been removed!',
+    'error': 'Error!',
+    'error_description': 'There was an error while trying to remove all voice channels created by the bot!',
+    'empty': 'Error!',
+    'empty_description': 'There are no voice channels created by the bot!',
+    'loading': 'Loading...',
+    'loading_description': 'There are **{0}** voice channels created by the bot. It will take up to **{1}** seconds to delete them all!',
+}
+
 with open('../language.ini', 'w') as configfile:
     config.write(configfile)

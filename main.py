@@ -188,16 +188,35 @@ async def list_intro(interaction: Interaction):
         embed = nextcord.Embed(title=lang['LIST']['error'], description=lang['LIST']['error_description'],color=nextcord.Color.red())
         await output.edit(embed=embed)
 
+#clear command
+# @client.slash_command(name=lang['CLEAR']['name'], description=lang['CLEAR']['description'], dm_permission=False, default_member_permissions=8)
+# #selection menu
+# async def clear(interaction: Interaction):
+#     keys = r.keys(f"temp:{interaction.guild.id}:*")
+#     if len(keys) == 0:
+#         embed = nextcord.Embed(title=lang['CLEAR']['empty'],
+#                                description=lang['CLEAR']['empty_description'].format(interaction.guild.name),
+#                                color=nextcord.Color.yellow())
+#         await interaction.response.send_message(embed=embed, ephemeral=True)
+#     else:
+#         embed = nextcord.Embed(title=lang['CLEAR']['loading'],
+#                                description=lang['CLEAR']['loading_description'].format(len(keys), len(keys)),
+#                                color=nextcord.Color.blue())
+#         output = await interaction.response.send_message(embed=embed, ephemeral=True)
+
 
 # on user joining/leaving voice channel
 @client.event
 async def on_voice_state_update(member, before, after):
-    if after.channel == None:
+    # if user leaves a voice channel
+    if before.channel != None:
         if r.get(f"temp:{before.channel.guild.id}:{before.channel.id}") != None:
             if len(before.channel.members) == 0:
                 await before.channel.delete()
                 r.delete(f"temp:{before.channel.guild.id}:{before.channel.id}")
-    else:
+
+    # if user joins / transfers to a voice channel
+    if after.channel != None:
         if r.get(f"auto:{after.channel.guild.id}:{after.channel.id}") != None:
             category = after.channel.category
             new_channel = await after.channel.guild.create_voice_channel(name=member.display_name, category=category)
