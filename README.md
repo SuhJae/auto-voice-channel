@@ -1,4 +1,9 @@
 # discord_auto_voice_channel
+![](https://img.shields.io/pypi/pyversions/nextcord?style=flat-square)
+![](https://img.shields.io/github/release-date-pre/HongWonYul/discord_auto_voice_channel?style=flat-square)
+![](https://img.shields.io/github/downloads/HongWonYul/discord_auto_voice_channel/total?style=flat-square)
+![](https://img.shields.io/github/v/release/hongwonyul/discord_auto_voice_channel?include_prereleases)
+![](https://img.shields.io/github/license/hongwonyul/discord_auto_voice_channel?style=flat-square)
 
 This project is in development, but it is still usable.
 
