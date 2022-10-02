@@ -1,4 +1,8 @@
 # discord_auto_voice_channel
+![](https://img.shields.io/pypi/pyversions/nextcord?style=flat-square)
+![](https://img.shields.io/github/release-date-pre/HongWonYul/discord_auto_voice_channel?style=flat-square)
+![](https://img.shields.io/github/downloads/HongWonYul/discord_auto_voice_channel/total?style=flat-square)
+![](https://img.shields.io/github/license/hongwonyul/discord_auto_voice_channel?style=flat-square)
 
 This project is in development, but it is still usable.
 
@@ -33,3 +37,5 @@ Python packages: Redis, nextcord
 /delete `channel` - Deactivates auto voice channel, so it no longer makes a channel when a user joins.
 
 /list - View all acvive automatic voice channel.
+
+/clear - Delets all channels created by the bot. (In case of the bot going offline for a bit)
