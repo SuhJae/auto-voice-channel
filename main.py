@@ -243,7 +243,8 @@ async def on_voice_state_update(member, before, after):
     if after.channel != None:
         if r.get(f"auto:{after.channel.guild.id}:{after.channel.id}") != None:
             category = after.channel.category
-            new_channel = await after.channel.guild.create_voice_channel(name=member.display_name, category=category)
+            overwrites = {member: nextcord.PermissionOverwrite(manage_channels=True)}
+            new_channel = await after.channel.guild.create_voice_channel(name=member.display_name, category=category, overwrites=overwrites)
             await member.move_to(new_channel)
             r.set(f"temp:{after.channel.guild.id}:{new_channel.id}", member.id)
 
