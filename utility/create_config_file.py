@@ -15,7 +15,8 @@ config['SETTINGS'] = {
 config['REDIS'] = {
     'host': 'localhost',
     'port': '6379',
-    'password': 'YOUR_PASSWORD_HERE'
+    'password': 'YOUR_PASSWORD_HERE',
+    'db': '0'
 }
 
 with open('config.ini', 'w') as configfile:
