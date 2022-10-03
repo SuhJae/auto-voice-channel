@@ -47,7 +47,7 @@ config['CLEAR'] = {
     'success': 'Success!',
     'success_description': 'All **{0}** voice channels created by the bot have been removed!',
     'partial': 'Success!',
-    'partial_description': '**{0}** voice channels created by the bot have been removed! **{0}** voice channels could not be removed.',
+    'partial_description': '**{0}** voice channels created by the bot have been removed! **{1}** voice channels could not be removed.',
     'failure': 'Error!',
     'failure_description': 'There was an error while trying to remove all voice channels created by the bot! Please check the permission of the bot.',
     'error': 'Error!',
