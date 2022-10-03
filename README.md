@@ -7,6 +7,8 @@
 
 * Offical Bot(Korean): [Invite](https://discord.com/api/oauth2/authorize?client_id=1024514599216746496&permissions=75792&scope=bot%20applications.commands)
 
+![](https://archive.cysub.net/bot.gif)
+
 This Discord bot will allow users to create auto voice channels without giving them edit channel permission. The bot will automatically generate a voice channel when the user joins the auto voice channel (previously set by the administrator). One of the most significant strengths is that this project uses Redis to store data, meaning swifter than using a traditional database and fully scalable in the future. Also, all of the messages are easily editable in [language.ini](https://github.com/HongWonYul/auto-voice-channel/blob/main/language.ini])
 
 ## Requirments
