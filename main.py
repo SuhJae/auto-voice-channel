@@ -227,6 +227,48 @@ async def clear(interaction: Interaction):
                                    color=nextcord.Color.yellow())
         await output.edit(embed=embed)
 
+@client.slash_command(name=lang['HELP']['name'], description=lang['HELP']['description'], dm_permission=True)
+async def help(interaction: Interaction,
+                arg: str = nextcord.SlashOption(
+                    name=lang['HELP']['argument'],
+                    description=lang['HELP']['argument_description'],
+                    required=False,
+                    choices=[lang['CREATE']['name'], lang['DELETE']['name'], lang['LIST']['name'], lang['CLEAR']['name'], lang['HELP']['name']])
+                ):
+    if arg == None:
+        embed = nextcord.Embed(title=lang['HELP']['embed_title'], description=lang['HELP']['embed_description'],
+                               color=nextcord.Color.green())
+        embed.add_field(name=f"**· /{lang['CREATE']['name']} `{lang['HELP']['voice_channel']}`**", value=lang['CREATE']['description'], inline=False)
+        embed.add_field(name=f"**· /{lang['DELETE']['name']} `{lang['HELP']['voice_channel']}`**", value=lang['DELETE']['description'], inline=False)
+        embed.add_field(name=f"**· /{lang['LIST']['name']}**", value=lang['LIST']['description'], inline=False)
+        embed.add_field(name=f"**· /{lang['CLEAR']['name']}**", value=lang['CLEAR']['description'], inline=False)
+        embed.add_field(name=f"**· /{lang['HELP']['name']} `{lang['HELP']['command']}` ({lang['HELP']['optional']})**", value=lang['HELP']['description'], inline=False)
+        embed.set_footer(text=lang['HELP']['footer'].format(f"/{lang['HELP']['name']} <{lang['HELP']['command']}>"))
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+    else:
+        if arg == lang['CREATE']['name']:
+            embed = nextcord.Embed(title=f"{lang['CREATE']['name']}", description=lang['CREATE']['description'], color=nextcord.Color.green())
+            embed.add_field(name=lang['HELP']['usage'], value=f"/{lang['CREATE']['name']} `{lang['HELP']['voice_channel']}`", inline=False)
+            embed.add_field(name=lang['HELP']['permission'], value=f"`{lang['HELP']['permission_administrator']}`", inline=False)
+        elif arg == lang['DELETE']['name']:
+            embed = nextcord.Embed(title=f"{lang['DELETE']['name']}", description=lang['DELETE']['description'], color=nextcord.Color.green())
+            embed.add_field(name=lang['HELP']['usage'], value=f"/{lang['DELETE']['name']} `{lang['HELP']['voice_channel']}`", inline=False)
+            embed.add_field(name=lang['HELP']['permission'], value=f"`{lang['HELP']['permission_administrator']}`", inline=False)
+        elif arg == lang['LIST']['name']:
+            embed = nextcord.Embed(title=f"{lang['LIST']['name']}", description=lang['LIST']['description'], color=nextcord.Color.green())
+            embed.add_field(name=lang['HELP']['usage'], value=f"/{lang['LIST']['name']}", inline=False)
+            embed.add_field(name=lang['HELP']['permission'], value=f"`{lang['HELP']['permission_none']}`", inline=False)
+        elif arg == lang['CLEAR']['name']:
+            embed = nextcord.Embed(title=f"{lang['CLEAR']['name']}", description=lang['CLEAR']['description'], color=nextcord.Color.green())
+            embed.add_field(name=lang['HELP']['usage'], value=f"/{lang['CLEAR']['name']}", inline=False)
+            embed.add_field(name=lang['HELP']['permission'], value=f"`{lang['HELP']['permission_administrator']}`", inline=False)
+        elif arg == lang['HELP']['name']:
+            embed = nextcord.Embed(title=f"{lang['HELP']['name']}", description=lang['HELP']['description'], color=nextcord.Color.green())
+            embed.add_field(name=lang['HELP']['usage'], value=f"/{lang['HELP']['name']} `{lang['HELP']['command']}` ({lang['HELP']['optional']})", inline=False)
+            embed.add_field(name=lang['HELP']['permission'], value=f"`{lang['HELP']['permission_none']}`", inline=False)
+
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+
 
 
 # on user joining/leaving voice channel

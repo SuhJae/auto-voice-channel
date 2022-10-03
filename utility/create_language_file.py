@@ -58,5 +58,24 @@ config['CLEAR'] = {
     'loading_description': 'There are **{0}** voice channels created by the bot. It will take up to **{1}** seconds to delete them all!',
 }
 
+config['HELP'] = {
+    'name': 'help',
+    'description': 'Shows a list of all commands or information about a specific command',
+    'argument': 'command',
+    'argument_description': 'Select a command to get more information about it',
+    'embed_title': 'Help',
+    'embed_description': 'Here is a list of all commands',
+    'voice_channel': 'Voice channel',
+    'command': 'Command',
+    'optional': 'Optional',
+    'usage': 'Usage',
+    'permission': 'Permission',
+    'permission_administrator': 'Administrator',
+    'permission_none': 'None',
+    'footer' : 'You can use {0} to get info on a specific command!'
+}
+
+
+
 with open('../language.ini', 'w') as configfile:
     config.write(configfile)
