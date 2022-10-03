@@ -9,7 +9,7 @@ config['CREDENTIALS'] = {
 config['SETTINGS'] = {
     'prefix': '!',
     'status': 'online',
-    'status_message': 'Auto Voice Channels',
+    'status_message': 'Voice Channels',
     'status_type': 'playing'
 }
 config['REDIS'] = {
