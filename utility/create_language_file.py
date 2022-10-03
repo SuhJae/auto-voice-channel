@@ -62,7 +62,7 @@ config['HELP'] = {
     'argument': 'command',
     'argument_description': 'Select a command to get more information about it',
     'embed_title': 'Help',
-    'embed_description': 'Here is a list of all commands',
+    'embed_description': 'Here is a list of all commands. Invite the bot to your server with [this link](https://discord.com/api/oauth2/authorize?client_id=1024514599216746496&permissions=75792&scope=bot%%20applications.commands)!',
     'voice_channel': 'Voice channel',
     'command': 'Command',
     'optional': 'Optional',
@@ -73,7 +73,19 @@ config['HELP'] = {
     'footer' : 'You can use {0} to get info on a specific command!'
 }
 
+config['INVITE'] = {
+    'name': 'invite',
+    'description': 'Get the invite link of the bot',
+    'embed_title': 'Invite',
+    'embed_description': 'You can invite the bot to your server with [this link](https://discord.com/api/oauth2/authorize?client_id=1024514599216746496&permissions=75792&scope=bot%%20applications.commands)!',
+}
 
+config['PING'] = {
+    'name': 'ping',
+    'description': 'Get the latency of the bot',
+    'embed_title': 'Ping',
+    'embed_description': 'The bot has a ping of **{0}** ms!',
+}
 
 with open('../language.ini', 'w') as configfile:
     config.write(configfile)

@@ -242,7 +242,7 @@ async def help(interaction: Interaction,
                     name=lang['HELP']['argument'],
                     description=lang['HELP']['argument_description'],
                     required=False,
-                    choices=[lang['CREATE']['name'], lang['DELETE']['name'], lang['LIST']['name'], lang['CLEAR']['name'], lang['HELP']['name']])
+                    choices=[lang['CREATE']['name'], lang['DELETE']['name'], lang['LIST']['name'], lang['CLEAR']['name'], lang['HELP']['name'], lang['INVITE']['name'], lang['PING']['name']])
                 ):
     if arg == None:
         embed = nextcord.Embed(title=lang['HELP']['embed_title'], description=lang['HELP']['embed_description'],
@@ -251,6 +251,8 @@ async def help(interaction: Interaction,
         embed.add_field(name=f"**· /{lang['DELETE']['name']} `{lang['HELP']['voice_channel']}`**", value=lang['DELETE']['description'], inline=False)
         embed.add_field(name=f"**· /{lang['LIST']['name']}**", value=lang['LIST']['description'], inline=False)
         embed.add_field(name=f"**· /{lang['CLEAR']['name']}**", value=lang['CLEAR']['description'], inline=False)
+        embed.add_field(name=f"**· /{lang['INVITE']['name']}**", value=lang['INVITE']['description'], inline=False)
+        embed.add_field(name=f"**· /{lang['PING']['name']}**", value=lang['PING']['description'], inline=False)
         embed.add_field(name=f"**· /{lang['HELP']['name']} `{lang['HELP']['command']}` ({lang['HELP']['optional']})**", value=lang['HELP']['description'], inline=False)
         embed.set_footer(text=lang['HELP']['footer'].format(f"/{lang['HELP']['name']} <{lang['HELP']['command']}>"))
         await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -275,8 +277,26 @@ async def help(interaction: Interaction,
             embed = nextcord.Embed(title=f"{lang['HELP']['name']}", description=lang['HELP']['description'], color=nextcord.Color.green())
             embed.add_field(name=lang['HELP']['usage'], value=f"/{lang['HELP']['name']} `{lang['HELP']['command']}` ({lang['HELP']['optional']})", inline=False)
             embed.add_field(name=lang['HELP']['permission'], value=f"`{lang['HELP']['permission_none']}`", inline=False)
+        elif arg == lang['INVITE']['name']:
+            embed = nextcord.Embed(title=f"{lang['INVITE']['name']}", description=lang['INVITE']['description'], color=nextcord.Color.green())
+            embed.add_field(name=lang['HELP']['usage'], value=f"/{lang['INVITE']['name']}", inline=False)
+            embed.add_field(name=lang['HELP']['permission'], value=f"`{lang['HELP']['permission_none']}`", inline=False)
+        elif arg == lang['PING']['name']:
+            embed = nextcord.Embed(title=f"{lang['PING']['name']}", description=lang['PING']['description'], color=nextcord.Color.green())
+            embed.add_field(name=lang['HELP']['usage'], value=f"/{lang['PING']['name']}", inline=False)
+            embed.add_field(name=lang['HELP']['permission'], value=f"`{lang['HELP']['permission_none']}`", inline=False)
 
         await interaction.response.send_message(embed=embed, ephemeral=True)
+
+@client.slash_command(name=lang['PING']['name'], description=lang['PING']['description'], dm_permission=True)
+async def ping(interaction: Interaction):
+    embed = nextcord.Embed(title=lang['PING']['embed_title'], description=lang['PING']['embed_description'].format(round(client.latency * 1000)), color=nextcord.Color.green())
+    await interaction.response.send_message(embed=embed, ephemeral=True)
+
+@client.slash_command(name=lang['INVITE']['name'], description=lang['INVITE']['description'], dm_permission=True)
+async def invite(interaction: Interaction):
+    embed = nextcord.Embed(title=lang['INVITE']['embed_title'], description=lang['INVITE']['embed_description'], color=nextcord.Color.green())
+    await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
 # on user joining/leaving voice channel
