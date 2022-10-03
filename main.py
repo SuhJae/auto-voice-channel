@@ -130,7 +130,7 @@ async def delete_intro(interaction: Interaction,
                            description=lang['DELETE']['argument_description'],
                            required=True,
                        ),
-                       ):
+                   ):
     try:
         if r.exists(f"auto:{channel.guild.id}:{channel.id}"):
             r.delete(f"auto:{channel.guild.id}:{channel.id}")
