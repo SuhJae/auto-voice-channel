@@ -2,7 +2,6 @@
 ### A Discord bot that allows users to create voice channels when needed.
 ![](https://img.shields.io/pypi/pyversions/nextcord?style=flat-square)
 ![](https://img.shields.io/github/release-date-pre/HongWonYul/discord_auto_voice_channel?style=flat-square)
-![](https://img.shields.io/github/downloads/HongWonYul/discord_auto_voice_channel/total?style=flat-square)
 ![](https://img.shields.io/github/license/hongwonyul/discord_auto_voice_channel?style=flat-square)
 
 * Offical Bot(Korean): [Invite](https://discord.com/api/oauth2/authorize?client_id=1024514599216746496&permissions=75792&scope=bot%20applications.commands)
