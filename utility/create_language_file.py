@@ -34,8 +34,6 @@ config['LIST'] = {
     'embed_title': 'Automatic voice channels',
     'embed_description': 'There are **{0}** automatic voice channels in **{1}**!',
     'embed_field_name': 'Automatic voice channel',
-    'loading': 'Loading...',
-    'loading_description': 'There are **{0}** automatic voice channels in **{1}**. It will take up to **{2}** seconds to load them all!',
     'empty': 'No automatic voice channels!',
     'empty_description': 'There are no automatic voice channels in **{0}**!',
     'embed_footer': 'There are {0} deleted channels which were removed from our database.'

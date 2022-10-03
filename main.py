@@ -153,44 +153,56 @@ async def delete_intro(interaction: Interaction,
 async def list_intro(interaction: Interaction):
     try:
         keys = r.keys(f"auto:{interaction.guild.id}:*")
-        if len(keys) == 0:
+        temp_keys = r.keys(f"temp:{interaction.guild.id}:*")
+        if len(keys) + len(temp_keys) == 0:
             embed = nextcord.Embed(title=lang['LIST']['empty'],
                                    description=lang['LIST']['empty_description'].format(interaction.guild.name),
                                    color=nextcord.Color.yellow())
             await interaction.response.send_message(embed=embed, ephemeral=True)
         else:
-            embed = nextcord.Embed(title=lang['LIST']['loading'],
-                                   description=lang['LIST']['loading_description'].format(len(keys), interaction.guild.name,
-                                                                                          len(keys)),
-                                   color=nextcord.Color.blue())
-            output = await interaction.response.send_message(embed=embed, ephemeral=True)
 
             embed = nextcord.Embed(title=lang['LIST']['embed_title'],
                                    description=lang['LIST']['embed_description'].format(len(keys), interaction.guild.name),
                                    color=nextcord.Color.green())
-            value = ""
 
             del_count = 0
+            final_list = []
+            hub_list = []
+
             for num, key in enumerate(keys):
                 try:
-                    channel = await client.fetch_channel(int(key.split(":")[2]))
-                    value = f"{value}\n`{num + 1}`  {channel.mention}"
+                    final_list.append(f"\n\n`{num + 1}.`  <#{int(key.split(':')[2])}>")
+                    hub_list.append(int(key.split(":")[2]))
                 except:
                     r.delete(key)
                     del_count += 1
+            for key in temp_keys:
+                try:
+                    ch = r.get(key)
+                    if int(ch) in hub_list:
+                        #find the index of the channel in the hub_list
+                        index = hub_list.index(int(ch))
+                        final_list.insert(index + 1, f"\n` └`  <#{key.split(':')[2]}>")
+                        hub_list.insert(index + 1, int(ch))
+                except:
+                    r.delete(key)
+                    del_count += 1
+            value = ""
+            for i in range(len(final_list)):
+                value = value + final_list[i]
 
             embed.add_field(name=lang['LIST']['embed_field_name'], value=value, inline=False)
+
             if del_count > 0:
                 embed.set_footer(text=lang['LIST']['embed_footer'].format(del_count))
-            await output.edit(embed=embed)
+            await interaction.response.send_message(embed=embed, ephemeral=True)
 
     except:
         embed = nextcord.Embed(title=lang['LIST']['error'], description=lang['LIST']['error_description'],color=nextcord.Color.red())
-        await output.edit(embed=embed)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
 # clear command
 @client.slash_command(name=lang['CLEAR']['name'], description=lang['CLEAR']['description'], dm_permission=False, default_member_permissions=8)
-#selection menu
 async def clear(interaction: Interaction):
     keys = r.keys(f"temp:{interaction.guild.id}:*")
     if len(keys) == 0:
@@ -204,15 +216,13 @@ async def clear(interaction: Interaction):
                                color=nextcord.Color.blue())
         output = await interaction.response.send_message(embed=embed, ephemeral=True)
         error_count = 0
-
         for key in keys:
             r.delete(key)
             try:
-                channel = await client.fetch_channel(int(key.split(":")[2]))
+                channel = client.get_channel(int(key.split(':')[2]))
                 await channel.delete()
             except:
                 error_count += 1
-
         if error_count == 0:
             embed = nextcord.Embed(title=lang['CLEAR']['success'],
                                    description=lang['CLEAR']['success_description'].format(len(keys)),
@@ -221,7 +231,6 @@ async def clear(interaction: Interaction):
             embed = nextcord.Embed(title=lang['CLEAR']['failure'],
                                    description=lang['CLEAR']['failure_description'].format(len(keys)),
                                    color=nextcord.Color.red())
-        else:
             embed = nextcord.Embed(title=lang['CLEAR']['partial'],
                                    description=lang['CLEAR']['partial_description'].format(len(keys), error_count),
                                    color=nextcord.Color.yellow())
@@ -270,7 +279,6 @@ async def help(interaction: Interaction,
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
-
 # on user joining/leaving voice channel
 @client.event
 async def on_voice_state_update(member, before, after):
@@ -288,7 +296,7 @@ async def on_voice_state_update(member, before, after):
             overwrites = {member: nextcord.PermissionOverwrite(manage_channels=True)}
             new_channel = await after.channel.guild.create_voice_channel(name=member.display_name, category=category, overwrites=overwrites)
             await member.move_to(new_channel)
-            r.set(f"temp:{after.channel.guild.id}:{new_channel.id}", member.id)
+            r.set(f"temp:{after.channel.guild.id}:{new_channel.id}", after.channel.id)
 
 #when voice channel is deleted
 @client.event
