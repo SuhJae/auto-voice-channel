@@ -1,5 +1,5 @@
 # auto-voice-channel
-### A Discord bot that allows users to create voice channels when needed.
+### A Discord bot that creates voice channels for users with lightning-fast performance.
 ![](https://img.shields.io/pypi/pyversions/nextcord?style=flat-square)
 ![](https://img.shields.io/github/release-date-pre/HongWonYul/discord_auto_voice_channel?style=flat-square)
 ![](https://img.shields.io/github/license/hongwonyul/discord_auto_voice_channel?style=flat-square)
