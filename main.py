@@ -325,3 +325,4 @@ async def on_guild_channel_delete(channel):
         r.delete(f"auto:{channel.guild.id}:{channel.id}")
 
 client.run(token)
+
