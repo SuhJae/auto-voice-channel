@@ -324,5 +324,18 @@ async def on_guild_channel_delete(channel):
     if r.get(f"auto:{channel.guild.id}:{channel.id}") != None:
         r.delete(f"auto:{channel.guild.id}:{channel.id}")
 
+@client.event
+async def on_message(message):
+    if message.author.bot:
+        return
+    if message.content.startswith(".l"):
+        embed = nextcord.Embed(title="담화 도령 봇을 소개합니다!", description="담화 도령은 유저들이 필요할 때 **자신만의 음성 채널**을 만들 수 있게 해주는 봇 입니다! 기존 자동 음성 봇과 다른 **차세데 데이타 베이스**를 적용하여 빠른 속도와 안정성을 선사합니다! 또한, 봇에 대한 신뢰성을 위해 모든 코드를 자신있게 **오픈소스**로 공개하였습니다! 한번 <#978993126653952080> 음성 채널을 확인해 보세요!", color=nextcord.Color.green())
+        embed.set_image(url="https://archive.cysub.net/bot.gif")
+        embed.add_field(name="**초대**", value="`/초대` 명령어를 사용하거나 [여기](https://discord.com/api/oauth2/authorize?client_id=1024514599216746496&&permissions=17902608&scope=bot%20applications.commands)를 클릭하여 초대해 주세요!", inline=False)
+        embed.add_field(name="**도움말**", value="`/도움말` 명령어를 사용하거나 [여기](https://github.com/HongWonYul/auto-voice-channel#commands)를 클릭하여 확인하세요!", inline=False)
+        embed.add_field(name="**소스코드**", value="[여기서](https://github.com/HongWonYul/auto-voice-channel) 확인하세요!", inline=False)
+
+        await message.channel.send(embed=embed)
+
 client.run(token)
 

@@ -38,6 +38,16 @@ This Discord bot will allow users to create auto voice channels without giving t
 13. You can customize all messages and the command's name by editing the language.ino
 14. Run main.py
 15. Invite your bot and enjoy!
+* Your Bot must have following permissions and `slash commands` permission:
+  * Manage Channels
+  * Connect
+  * Move Members
+* For features that are planned to be added in the future, your bot must have following permissions:
+  * Read Messages
+  * Send Messages
+  * Manage Messages
+  * Read Message History
+* You may use this link that has all the permissions: `https://discord.com/api/oauth2/authorize?client_id=<USE_YOUR_CLIENT_ID>&&permissions=17902608&scope=bot%20applications.commands`
 
 ## Commands
 
