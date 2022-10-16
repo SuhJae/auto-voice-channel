@@ -327,7 +327,7 @@ async def settings(interaction: Interaction):
     else:
         final = lang['DASHBOARD']['none']
 
-    embed.add_field(name='Voice Channels ({0})'.format(len(keys)), value=final, inline=True)
+    embed.add_field(name=lang['DASHBOARD']['auto_channel'].format(len(keys)), value=final, inline=True)
 
     #Gets all the temp voice channels and adds them to the embed field
     final = ''
@@ -336,7 +336,7 @@ async def settings(interaction: Interaction):
             final += f"\n<#{int(key.split(':')[2])}>"
     else:
         final = lang['DASHBOARD']['none']
-    embed.add_field(name='Temp Channels ({0})'.format(len(temp_keys)), value=final, inline=True)
+    embed.add_field(name=lang['DASHBOARD']['temp_channel'].format(len(temp_keys)), value=final, inline=True)
 
     selections = [
         nextcord.SelectOption(label=lang['DASHBOARD']['selection_add'], value='add', emoji='➕'),

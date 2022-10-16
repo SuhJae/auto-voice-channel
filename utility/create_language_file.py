@@ -97,6 +97,8 @@ config['DASHBOARD'] = {
     'selection_clear': 'Clear Auto Voice Channels',
     'selection_list': 'List Auto Voice Channels',
     'none': '`None`',
+    'auto_channel': 'Auto Voice Channels ({0})',
+    'temp_channel': 'Temp Channels ({0})',
 }
 
 config['DROPDOWN'] = {
