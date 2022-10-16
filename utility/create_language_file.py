@@ -87,5 +87,31 @@ config['PING'] = {
     'embed_description': 'The bot has a ping of **{0}** ms!',
 }
 
+config['DASHBOARD'] = {
+    'name': 'dashboard',
+    'description': 'Opens the dashboard of the bot',
+    'embed_title': 'Dashboard of **{0}**',
+    'embed_description': 'You can use dropdown below to change settings.',
+    'selection_add': 'Add Auto Voice Channel',
+    'selection_remove': 'Remove Auto Voice Channel',
+    'selection_clear': 'Clear Auto Voice Channels',
+    'selection_list': 'List Auto Voice Channels',
+    'none': '`None`',
+}
+
+config['DROPDOWN'] = {
+    'placeholder': 'Select an option',
+    'add_title': 'Add Auto Voice Channel',
+    'add_description': 'Select a voice channel that will be used as a automatic voice channel',
+    'add_empty': 'There are no voice channels in this server!',
+    'add_empty_description': 'Please create a voice channel first!',
+    'remove_title': 'Remove Auto Voice Channel',
+    'remove_description': 'Select a voice channel to remove it from the list of automatic voice channels.',
+    'remove_empty': 'There are no automatic voice channels in this server!',
+    'remove_empty_description': 'Please create a automatic voice channel first!',
+}
+
+
+
 with open('../language.ini', 'w') as configfile:
     config.write(configfile)

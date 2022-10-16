@@ -246,8 +246,8 @@ async def help(interaction: Interaction,
                     name=lang['HELP']['argument'],
                     description=lang['HELP']['argument_description'],
                     required=False,
-                    choices=[lang['CREATE']['name'], lang['DELETE']['name'], lang['LIST']['name'], lang['CLEAR']['name'], lang['HELP']['name'], lang['INVITE']['name'], lang['PING']['name']])
-                ):
+                    choices=[lang['CREATE']['name'], lang['DELETE']['name'], lang['LIST']['name'], lang['CLEAR']['name'], lang['HELP']['name'], lang['INVITE']['name'], lang['PING']['name'], lang['DASHBOARD']['name']]
+                )):
     if arg == None:
         embed = nextcord.Embed(title=lang['HELP']['embed_title'], description=lang['HELP']['embed_description'],
                                color=nextcord.Color.green())
@@ -258,6 +258,7 @@ async def help(interaction: Interaction,
         embed.add_field(name=f"**· /{lang['INVITE']['name']}**", value=lang['INVITE']['description'], inline=False)
         embed.add_field(name=f"**· /{lang['PING']['name']}**", value=lang['PING']['description'], inline=False)
         embed.add_field(name=f"**· /{lang['HELP']['name']} `{lang['HELP']['command']}` ({lang['HELP']['optional']})**", value=lang['HELP']['description'], inline=False)
+        embed.add_field(name=f"**· /{lang['DASHBOARD']['name']}**", value=lang['DASHBOARD']['description'], inline=False)
         embed.set_footer(text=lang['HELP']['footer'].format(f"/{lang['HELP']['name']} <{lang['HELP']['command']}>"))
         await interaction.response.send_message(embed=embed, ephemeral=True)
     else:
@@ -289,6 +290,10 @@ async def help(interaction: Interaction,
             embed = nextcord.Embed(title=f"{lang['PING']['name']}", description=lang['PING']['description'], color=nextcord.Color.green())
             embed.add_field(name=lang['HELP']['usage'], value=f"/{lang['PING']['name']}", inline=False)
             embed.add_field(name=lang['HELP']['permission'], value=f"`{lang['HELP']['permission_none']}`", inline=False)
+        elif arg == lang['DASHBOARD']['name']:
+            embed = nextcord.Embed(title=f"{lang['DASHBOARD']['name']}", description=lang['DASHBOARD']['description'], color=nextcord.Color.green())
+            embed.add_field(name=lang['HELP']['usage'], value=f"/{lang['DASHBOARD']['name']}", inline=False)
+            embed.add_field(name=lang['HELP']['permission'], value=f"`{lang['HELP']['permission_administrator']}`", inline=False)
 
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
@@ -308,11 +313,11 @@ async def invite(interaction: Interaction):
 
 
 #dashboard command
-@client.slash_command(name='settings', description='Shows dashboard to show overview of the server', dm_permission=False, default_member_permissions=8)
+@client.slash_command(name=lang['DASHBOARD']['name'], description=lang['DASHBOARD']['description'], dm_permission=False, default_member_permissions=8)
 async def settings(interaction: Interaction):
     keys = r.keys(f"auto:{interaction.guild.id}:*")
     temp_keys = r.keys(f"temp:{interaction.guild.id}:*")
-    embed = nextcord.Embed(title='Dashboard of **{0}**'.format(interaction.guild.name), description='You can use dropdown below to change settings.', color=nextcord.Color.green())
+    embed = nextcord.Embed(title=lang['DASHBOARD']['embed_title'].format(interaction.guild.name), description=lang['DASHBOARD']['embed_description'], color=nextcord.Color.green())
 
     #Gets all the voice channels and adds them to the embed field
     final = ''
@@ -320,7 +325,7 @@ async def settings(interaction: Interaction):
         for key in keys:
             final += f"\n<#{int(key.split(':')[2])}>"
     else:
-        final = 'None'
+        final = lang['DASHBOARD']['none']
 
     embed.add_field(name='Voice Channels ({0})'.format(len(keys)), value=final, inline=True)
 
@@ -330,18 +335,16 @@ async def settings(interaction: Interaction):
         for key in temp_keys:
             final += f"\n<#{int(key.split(':')[2])}>"
     else:
-        final = 'None'
+        final = lang['DASHBOARD']['none']
     embed.add_field(name='Temp Channels ({0})'.format(len(temp_keys)), value=final, inline=True)
 
     selections = [
-        nextcord.SelectOption(label='Add Voice Channel', value='add', emoji='➕'),
-        nextcord.SelectOption(label='Remove Voice Channel', value='remove', emoji='➖'),
-        nextcord.SelectOption(label='Clear temp Channel', value='clear', emoji='🧹'),
-        nextcord.SelectOption(label='View tree list of auto and temp voice channel', value='list', emoji='📜'),
+        nextcord.SelectOption(label=lang['DASHBOARD']['selection_add'], value='add', emoji='➕'),
+        nextcord.SelectOption(label=lang['DASHBOARD']['selection_remove'], value='remove', emoji='➖'),
+        nextcord.SelectOption(label=lang['DASHBOARD']['selection_clear'], value='clear', emoji='🧹'),
+        nextcord.SelectOption(label=lang['DASHBOARD']['selection_list'], value='list', emoji='📜'),
     ]
     view = DropdownMenu(selections)
-
-
     await interaction.response.send_message(embed=embed, ephemeral=True, view=view)
 
 
@@ -375,9 +378,8 @@ async def on_guild_channel_delete(channel):
 # Class to handle the dropdown
 class Dropdown(nextcord.ui.Select):
     def __init__(self, options):
-        super().__init__(placeholder='Select a action', options=options)
+        super().__init__(placeholder=lang['DROPDOWN']['placeholder'], options=options)
     async def callback(self, interaction: Interaction):
-        print(f'Selected {self.values[0]}')
         if self.values[0] == 'clear':
             keys = r.keys(f"temp:{interaction.guild.id}:*")
             if len(keys) == 0:
@@ -420,17 +422,23 @@ class Dropdown(nextcord.ui.Select):
                 #check if the channel is already added
                 if r.get(f"auto:{interaction.guild.id}:{channel.id}") == None:
                     selections.append(nextcord.SelectOption(label=channel.name, emoji='🔊', description=channel.id, value=f'addvoice:{channel.id}'))
-            view = DropdownMenu(selections)
-            embed = nextcord.Embed(title='add voice channel', description='Select a voice channel to add', color=nextcord.Color.green())
-            await interaction.response.send_message(embed=embed, ephemeral=True, view=view)
+            if len(selections) == 0:
+                embed = nextcord.Embed(title=lang['DROPDOWN']['add_empty'],
+                                       description=lang['DROPDOWN']['add_empty_description'].format(interaction.guild.name),
+                                       color=nextcord.Color.yellow())
+                await interaction.response.send_message(embed=embed, ephemeral=True)
+            else:
+                view = DropdownMenu(selections)
+                embed = nextcord.Embed(title=lang['DROPDOWN']['add_title'], description=lang['DROPDOWN']['add_description'], color=nextcord.Color.green())
+                await interaction.response.send_message(embed=embed, ephemeral=True, view=view)
 
         elif self.values[0] == 'remove':
             selections =[]
             #get all the voice channels in the server from redis
             keys = r.keys(f"auto:{interaction.guild.id}:*")
             if len(keys) == 0:
-                embed = nextcord.Embed(title=lang['REMOVE']['empty'],
-                                       description=lang['REMOVE']['empty_description'].format(interaction.guild.name),
+                embed = nextcord.Embed(title=lang['DROPDOWN']['remove_empty'],
+                                       description=lang['DROPDOWN']['remove_empty_description'].format(interaction.guild.name),
                                        color=nextcord.Color.yellow())
                 await interaction.response.send_message(embed=embed, ephemeral=True)
             else:
@@ -438,7 +446,7 @@ class Dropdown(nextcord.ui.Select):
                     channel = client.get_channel(int(key.split(':')[2]))
                     selections.append(nextcord.SelectOption(label=channel.name, emoji='🔊', description=channel.id, value=f'removevoice:{channel.id}'))
                 view = DropdownMenu(selections)
-                embed = nextcord.Embed(title='remove voice channel', description='Select a voice channel to remove', color=nextcord.Color.green())
+                embed = nextcord.Embed(title=lang['DROPDOWN']['remove_title'], description=lang['DROPDOWN']['remove_description'], color=nextcord.Color.green())
                 await interaction.response.send_message(embed=embed, ephemeral=True, view=view)
 
         elif self.values[0] == 'list':
@@ -497,7 +505,6 @@ class Dropdown(nextcord.ui.Select):
         elif self.values[0].startswith('addvoice:'):
             channel_id = self.values[0].split(':')[1]
             category = client.get_channel(int(channel_id)).category
-            print(category)
             try:
                 if r.exists(f"auto:{interaction.guild.id}:{channel_id}"):
                     embed = nextcord.Embed(title=lang['CREATE']['duplicate'],
