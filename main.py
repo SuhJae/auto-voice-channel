@@ -201,6 +201,7 @@ async def list_intro(interaction: Interaction):
         embed = nextcord.Embed(title=lang['LIST']['error'], description=lang['LIST']['error_description'],color=nextcord.Color.red())
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
+
 # clear command
 @client.slash_command(name=lang['CLEAR']['name'], description=lang['CLEAR']['description'], dm_permission=False, default_member_permissions=8)
 async def clear(interaction: Interaction):
@@ -231,11 +232,14 @@ async def clear(interaction: Interaction):
             embed = nextcord.Embed(title=lang['CLEAR']['failure'],
                                    description=lang['CLEAR']['failure_description'].format(len(keys)),
                                    color=nextcord.Color.red())
+        else:
             embed = nextcord.Embed(title=lang['CLEAR']['partial'],
                                    description=lang['CLEAR']['partial_description'].format(len(keys), error_count),
                                    color=nextcord.Color.yellow())
         await output.edit(embed=embed)
 
+
+# help command
 @client.slash_command(name=lang['HELP']['name'], description=lang['HELP']['description'], dm_permission=True)
 async def help(interaction: Interaction,
                 arg: str = nextcord.SlashOption(
@@ -288,15 +292,56 @@ async def help(interaction: Interaction,
 
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
+
+#ping command
 @client.slash_command(name=lang['PING']['name'], description=lang['PING']['description'], dm_permission=True)
 async def ping(interaction: Interaction):
     embed = nextcord.Embed(title=lang['PING']['embed_title'], description=lang['PING']['embed_description'].format(round(client.latency * 1000)), color=nextcord.Color.green())
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
+
+#invite command
 @client.slash_command(name=lang['INVITE']['name'], description=lang['INVITE']['description'], dm_permission=True)
 async def invite(interaction: Interaction):
     embed = nextcord.Embed(title=lang['INVITE']['embed_title'], description=lang['INVITE']['embed_description'], color=nextcord.Color.green())
     await interaction.response.send_message(embed=embed, ephemeral=True)
+
+
+#dashboard command
+@client.slash_command(name='settings', description='Shows dashboard to show overview of the server', dm_permission=False, default_member_permissions=8)
+async def settings(interaction: Interaction):
+    keys = r.keys(f"auto:{interaction.guild.id}:*")
+    temp_keys = r.keys(f"temp:{interaction.guild.id}:*")
+    embed = nextcord.Embed(title='Dashboard of **{0}**'.format(interaction.guild.name), description='You can use dropdown below to change settings.', color=nextcord.Color.green())
+
+    #Gets all the voice channels and adds them to the embed field
+    final = ''
+    if len(keys) > 0:
+        for key in keys:
+            final += f"<#{int(key.split(':')[2])}>"
+    else:
+        final = 'None'
+
+    embed.add_field(name='Voice Channels ({0})'.format(len(keys)), value=final, inline=True)
+
+    #Gets all the temp voice channels and adds them to the embed field
+    final = ''
+    if len(temp_keys) > 0:
+        for key in temp_keys:
+            final += f"<#{int(key.split(':')[2])}>"
+    else:
+        final = 'None'
+    embed.add_field(name='Temp Channels ({0})'.format(len(temp_keys)), value=final, inline=True)
+
+    selections = [
+        # nextcord.SelectOption(label='Add Voice Channel', value='add', emoji='➕'),
+        # nextcord.SelectOption(label='Remove Voice Channel', value='remove', emoji='➖'),
+        nextcord.SelectOption(label='Clear temp Channel', value='clear', emoji='🧹'),
+    ]
+    view = DropdownMenu(selections)
+
+
+    await interaction.response.send_message(embed=embed, ephemeral=True, view=view)
 
 
 # on user joining/leaving voice channel
@@ -318,24 +363,72 @@ async def on_voice_state_update(member, before, after):
             await member.move_to(new_channel)
             r.set(f"temp:{after.channel.guild.id}:{new_channel.id}", after.channel.id)
 
-#when voice channel is deleted
+
+# when voice channel is deleted
 @client.event
 async def on_guild_channel_delete(channel):
     if r.get(f"auto:{channel.guild.id}:{channel.id}") != None:
         r.delete(f"auto:{channel.guild.id}:{channel.id}")
 
-@client.event
-async def on_message(message):
-    if message.author.bot:
-        return
-    if message.content.startswith(".l"):
-        embed = nextcord.Embed(title="담화 도령 봇을 소개합니다!", description="담화 도령은 유저들이 필요할 때 **자신만의 음성 채널**을 만들 수 있게 해주는 봇 입니다! 기존 자동 음성 봇과 다른 **차세데 데이타 베이스**를 적용하여 빠른 속도와 안정성을 선사합니다! 또한, 봇에 대한 신뢰성을 위해 모든 코드를 자신있게 **오픈소스**로 공개하였습니다! 한번 <#978993126653952080> 음성 채널을 확인해 보세요!", color=nextcord.Color.green())
-        embed.set_image(url="https://archive.cysub.net/bot.gif")
-        embed.add_field(name="**초대**", value="`/초대` 명령어를 사용하거나 [여기](https://discord.com/api/oauth2/authorize?client_id=1024514599216746496&&permissions=17902608&scope=bot%20applications.commands)를 클릭하여 초대해 주세요!", inline=False)
-        embed.add_field(name="**도움말**", value="`/도움말` 명령어를 사용하거나 [여기](https://github.com/HongWonYul/auto-voice-channel#commands)를 클릭하여 확인하세요!", inline=False)
-        embed.add_field(name="**소스코드**", value="[여기서](https://github.com/HongWonYul/auto-voice-channel) 확인하세요!", inline=False)
 
-        await message.channel.send(embed=embed)
+# Class to handle the dropdown
+class Dropdown(nextcord.ui.Select):
+    def __init__(self, options):
+        super().__init__(placeholder='Select a action', options=options)
+    async def callback(self, interaction: Interaction):
+        print(f'Selected {self.values[0]}')
+        if self.values[0] == 'clear':
+            keys = r.keys(f"temp:{interaction.guild.id}:*")
+            if len(keys) == 0:
+                embed = nextcord.Embed(title=lang['CLEAR']['empty'],
+                                       description=lang['CLEAR']['empty_description'].format(interaction.guild.name),
+                                       color=nextcord.Color.yellow())
+                await interaction.response.send_message(embed=embed, ephemeral=True)
+            else:
+                embed = nextcord.Embed(title=lang['CLEAR']['loading'],
+                                       description=lang['CLEAR']['loading_description'].format(len(keys), len(keys)),
+                                       color=nextcord.Color.blue())
+                output = await interaction.response.send_message(embed=embed, ephemeral=True)
+                error_count = 0
+                for key in keys:
+                    r.delete(key)
+                    try:
+                        channel = client.get_channel(int(key.split(':')[2]))
+                        await channel.delete()
+                    except:
+                        error_count += 1
+                if error_count == 0:
+                    embed = nextcord.Embed(title=lang['CLEAR']['success'],
+                                           description=lang['CLEAR']['success_description'].format(len(keys)),
+                                           color=nextcord.Color.green())
+                elif error_count == len(keys):
+                    embed = nextcord.Embed(title=lang['CLEAR']['failure'],
+                                           description=lang['CLEAR']['failure_description'].format(len(keys)),
+                                           color=nextcord.Color.red())
+                else:
+                    embed = nextcord.Embed(title=lang['CLEAR']['partial'],
+                                           description=lang['CLEAR']['partial_description'].format(len(keys),
+                                                                                                   error_count),
+                                           color=nextcord.Color.yellow())
+                await output.edit(embed=embed)
 
+class DropdownMenu(nextcord.ui.View):
+    def __init__(self, options):
+        super().__init__()
+        self.add_item(Dropdown(options))
+
+# @client.event
+# async def on_message(message):
+#     if message.author.bot:
+#         return
+#     if message.content.startswith(".l"):
+#         embed = nextcord.Embed(title="담화 도령 봇을 소개합니다!", description="담화 도령은 유저들이 필요할 때 **자신만의 음성 채널**을 만들 수 있게 해주는 봇 입니다! 기존 자동 음성 봇과 다른 **차세데 데이타 베이스**를 적용하여 빠른 속도와 안정성을 선사합니다! 또한, 봇에 대한 신뢰성을 위해 모든 코드를 자신있게 **오픈소스**로 공개하였습니다! 한번 <#978993126653952080> 음성 채널을 확인해 보세요!", color=nextcord.Color.green())
+#         embed.set_image(url="https://archive.cysub.net/bot.gif")
+#         embed.add_field(name="**초대**", value="`/초대` 명령어를 사용하거나 [여기](https://discord.com/api/oauth2/authorize?client_id=1024514599216746496&&permissions=17902608&scope=bot%20applications.commands)를 클릭하여 초대해 주세요!", inline=False)
+#         embed.add_field(name="**도움말**", value="`/도움말` 명령어를 사용하거나 [여기](https://github.com/HongWonYul/auto-voice-channel#commands)를 클릭하여 확인하세요!", inline=False)
+#         embed.add_field(name="**소스코드**", value="[여기서](https://github.com/HongWonYul/auto-voice-channel) 확인하세요!", inline=False)
+#
+#         await message.channel.send(embed=embed)
+#
 client.run(token)
 
