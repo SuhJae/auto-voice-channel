@@ -5,12 +5,18 @@
 ![](https://img.shields.io/github/license/hongwonyul/discord_auto_voice_channel?style=flat-square)
 
 <p align="left">
-  <img width="300" height="169" src="https://archive.cysub.net/bot.gif">
+  <img width="300" height="169" src="media/introduction.gif">
 </p>
 
 This Discord bot will allow users to create auto voice channels without giving them edit channel permission. The bot will automatically generate a voice channel when the user joins the auto voice channel (previously set by the administrator). One of the most significant strengths is that this project uses Redis to store data, meaning swifter than using a traditional database and fully scalable in the future. Also, all of the messages are easily editable in [language.ini](https://github.com/HongWonYul/auto-voice-channel/blob/main/language.ini])
 
 * Offical Bot(Korean): [Invite](https://discord.com/api/oauth2/authorize?client_id=1024514599216746496&&permissions=17902608&scope=bot%20applications.commands)
+
+## Newest Features - v.1.3.0
+Added dashboard so user can manage their auto voice channel settings using Discord native dropdown menu.
+<p align="left">
+  <img width="1020" src="media/new.png">
+</p>
 
 ## Requirments
 * [Python 3.8+](https://www.python.org/downloads/)
