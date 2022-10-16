@@ -360,8 +360,8 @@ async def on_voice_state_update(member, before, after):
             category = after.channel.category
             overwrites = {member: nextcord.PermissionOverwrite(manage_channels=True)}
             new_channel = await after.channel.guild.create_voice_channel(name=member.display_name, category=category, overwrites=overwrites)
-            await member.move_to(new_channel)
             r.set(f"temp:{after.channel.guild.id}:{new_channel.id}", after.channel.id)
+            await member.move_to(new_channel)
 
 
 # when voice channel is deleted
