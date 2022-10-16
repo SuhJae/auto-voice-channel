@@ -334,7 +334,7 @@ async def settings(interaction: Interaction):
     embed.add_field(name='Temp Channels ({0})'.format(len(temp_keys)), value=final, inline=True)
 
     selections = [
-        # nextcord.SelectOption(label='Add Voice Channel', value='add', emoji='➕'),
+        nextcord.SelectOption(label='Add Voice Channel', value='add', emoji='➕'),
         # nextcord.SelectOption(label='Remove Voice Channel', value='remove', emoji='➖'),
         nextcord.SelectOption(label='Clear temp Channel', value='clear', emoji='🧹'),
     ]
@@ -411,6 +411,35 @@ class Dropdown(nextcord.ui.Select):
                                                                                                    error_count),
                                            color=nextcord.Color.yellow())
                 await output.edit(embed=embed)
+        elif self.values[0] == 'add':
+            selections =[]
+            #get all the voice channels in the server
+            for channel in interaction.guild.voice_channels:
+                selections.append(nextcord.SelectOption(label=channel.name, emoji='🔊', description=channel.id, value=f'addvoice:{channel.id}'))
+            view = DropdownMenu(selections)
+            embed = nextcord.Embed(title='add voice channel', description='Select a voice channel to add', color=nextcord.Color.green())
+            await interaction.response.send_message(embed=embed, ephemeral=True, view=view)
+
+        elif self.values[0].startswith('addvoice:'):
+            channel_id = self.values[0].split(':')[1]
+            category = client.get_channel(int(channel_id)).category
+            print(category)
+            try:
+                if r.exists(f"auto:{interaction.guild.id}:{channel_id}"):
+                    embed = nextcord.Embed(title=lang['CREATE']['duplicate'],
+                                           description=lang['CREATE']['duplicate_description'],
+                                           color=nextcord.Color.yellow())
+                    await interaction.response.send_message(embed=embed, ephemeral=True)
+                else:
+                    r.set(f"auto:{interaction.guild.id}:{channel_id}", category.id)
+                    embed = nextcord.Embed(title=lang['CREATE']['success'],
+                                           description=lang['CREATE']['success_description'].format(f'<#{channel_id}>'),
+                                           color=nextcord.Color.green())
+                    await interaction.response.send_message(embed=embed, ephemeral=True)
+            except:
+                embed = nextcord.Embed(title=lang['CREATE']['error'], description=lang['CREATE']['error_description'],
+                                       color=nextcord.Color.red())
+                await interaction.response.send_message(embed=embed, ephemeral=True)
 
 class DropdownMenu(nextcord.ui.View):
     def __init__(self, options):
