@@ -318,7 +318,7 @@ async def settings(interaction: Interaction):
     final = ''
     if len(keys) > 0:
         for key in keys:
-            final += f"<#{int(key.split(':')[2])}>"
+            final += f"\n<#{int(key.split(':')[2])}>"
     else:
         final = 'None'
 
@@ -328,15 +328,16 @@ async def settings(interaction: Interaction):
     final = ''
     if len(temp_keys) > 0:
         for key in temp_keys:
-            final += f"<#{int(key.split(':')[2])}>"
+            final += f"\n<#{int(key.split(':')[2])}>"
     else:
         final = 'None'
     embed.add_field(name='Temp Channels ({0})'.format(len(temp_keys)), value=final, inline=True)
 
     selections = [
         nextcord.SelectOption(label='Add Voice Channel', value='add', emoji='➕'),
-        # nextcord.SelectOption(label='Remove Voice Channel', value='remove', emoji='➖'),
+        nextcord.SelectOption(label='Remove Voice Channel', value='remove', emoji='➖'),
         nextcord.SelectOption(label='Clear temp Channel', value='clear', emoji='🧹'),
+        nextcord.SelectOption(label='View tree list of auto and temp voice channel', value='list', emoji='📜'),
     ]
     view = DropdownMenu(selections)
 
@@ -411,14 +412,87 @@ class Dropdown(nextcord.ui.Select):
                                                                                                    error_count),
                                            color=nextcord.Color.yellow())
                 await output.edit(embed=embed)
+
         elif self.values[0] == 'add':
             selections =[]
             #get all the voice channels in the server
             for channel in interaction.guild.voice_channels:
-                selections.append(nextcord.SelectOption(label=channel.name, emoji='🔊', description=channel.id, value=f'addvoice:{channel.id}'))
+                #check if the channel is already added
+                if r.get(f"auto:{interaction.guild.id}:{channel.id}") == None:
+                    selections.append(nextcord.SelectOption(label=channel.name, emoji='🔊', description=channel.id, value=f'addvoice:{channel.id}'))
             view = DropdownMenu(selections)
             embed = nextcord.Embed(title='add voice channel', description='Select a voice channel to add', color=nextcord.Color.green())
             await interaction.response.send_message(embed=embed, ephemeral=True, view=view)
+
+        elif self.values[0] == 'remove':
+            selections =[]
+            #get all the voice channels in the server from redis
+            keys = r.keys(f"auto:{interaction.guild.id}:*")
+            if len(keys) == 0:
+                embed = nextcord.Embed(title=lang['REMOVE']['empty'],
+                                       description=lang['REMOVE']['empty_description'].format(interaction.guild.name),
+                                       color=nextcord.Color.yellow())
+                await interaction.response.send_message(embed=embed, ephemeral=True)
+            else:
+                for key in keys:
+                    channel = client.get_channel(int(key.split(':')[2]))
+                    selections.append(nextcord.SelectOption(label=channel.name, emoji='🔊', description=channel.id, value=f'removevoice:{channel.id}'))
+                view = DropdownMenu(selections)
+                embed = nextcord.Embed(title='remove voice channel', description='Select a voice channel to remove', color=nextcord.Color.green())
+                await interaction.response.send_message(embed=embed, ephemeral=True, view=view)
+
+        elif self.values[0] == 'list':
+            try:
+                keys = r.keys(f"auto:{interaction.guild.id}:*")
+                temp_keys = r.keys(f"temp:{interaction.guild.id}:*")
+                if len(keys) + len(temp_keys) == 0:
+                    embed = nextcord.Embed(title=lang['LIST']['empty'],
+                                           description=lang['LIST']['empty_description'].format(interaction.guild.name),
+                                           color=nextcord.Color.yellow())
+                    await interaction.response.send_message(embed=embed, ephemeral=True)
+                else:
+
+                    embed = nextcord.Embed(title=lang['LIST']['embed_title'],
+                                           description=lang['LIST']['embed_description'].format(len(keys),
+                                                                                                interaction.guild.name),
+                                           color=nextcord.Color.green())
+
+                    del_count = 0
+                    final_list = []
+                    hub_list = []
+
+                    for num, key in enumerate(keys):
+                        try:
+                            final_list.append(f"\n\n`{num + 1}.`  <#{int(key.split(':')[2])}>")
+                            hub_list.append(int(key.split(":")[2]))
+                        except:
+                            r.delete(key)
+                            del_count += 1
+                    for key in temp_keys:
+                        try:
+                            ch = r.get(key)
+                            if int(ch) in hub_list:
+                                # find the index of the channel in the hub_list
+                                index = hub_list.index(int(ch))
+                                final_list.insert(index + 1, f"\n` └`  <#{key.split(':')[2]}>")
+                                hub_list.insert(index + 1, int(ch))
+                        except:
+                            r.delete(key)
+                            del_count += 1
+                    value = ""
+                    for i in range(len(final_list)):
+                        value = value + final_list[i]
+
+                    embed.add_field(name=lang['LIST']['embed_field_name'], value=value, inline=False)
+
+                    if del_count > 0:
+                        embed.set_footer(text=lang['LIST']['embed_footer'].format(del_count))
+                    await interaction.response.send_message(embed=embed, ephemeral=True)
+
+            except:
+                embed = nextcord.Embed(title=lang['LIST']['error'], description=lang['LIST']['error_description'],
+                                       color=nextcord.Color.red())
+                await interaction.response.send_message(embed=embed, ephemeral=True)
 
         elif self.values[0].startswith('addvoice:'):
             channel_id = self.values[0].split(':')[1]
@@ -438,6 +512,25 @@ class Dropdown(nextcord.ui.Select):
                     await interaction.response.send_message(embed=embed, ephemeral=True)
             except:
                 embed = nextcord.Embed(title=lang['CREATE']['error'], description=lang['CREATE']['error_description'],
+                                       color=nextcord.Color.red())
+                await interaction.response.send_message(embed=embed, ephemeral=True)
+
+        elif self.values[0].startswith('removevoice:'):
+            channel_id = self.values[0].split(':')[1]
+            try:
+                if r.exists(f"auto:{interaction.guild.id}:{channel_id}"):
+                    r.delete(f"auto:{interaction.guild.id}:{channel_id}")
+                    embed = nextcord.Embed(title=lang['DELETE']['success'],
+                                           description=lang['DELETE']['success_description'].format(f'<#{channel_id}>'),
+                                           color=nextcord.Color.green())
+                    await interaction.response.send_message(embed=embed, ephemeral=True)
+                else:
+                    embed = nextcord.Embed(title=lang['DELETE']['not_found'],
+                                           description=lang['DELETE']['not_found_description'],
+                                           color=nextcord.Color.yellow())
+                    await interaction.response.send_message(embed=embed, ephemeral=True)
+            except:
+                embed = nextcord.Embed(title=lang['DELETE']['error'], description=lang['DELETE']['error_description'],
                                        color=nextcord.Color.red())
                 await interaction.response.send_message(embed=embed, ephemeral=True)
 
