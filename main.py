@@ -79,6 +79,15 @@ intents.message_content = True
 
 client = commands.Bot(command_prefix=prefix, intents=intents)
 
+def lang_check(locale):
+    if locale == "en-US":
+        return english
+    elif locale == "ko":
+        return korean
+    elif locale == "zh-CN":
+        return chinese
+    else:
+        return lang
 
 # Bot startup
 @client.event
@@ -321,17 +330,9 @@ async def help(interaction: Interaction,
                         })
 async def ping(interaction: Interaction):
     print(interaction.locale)
-    if interaction.locale == "en-US":
-        templang = english
-    elif interaction.locale == "ko":
-        templang = korean
-    elif interaction.locale == "zh-CN":
-        templang = chinese
-    else:
-        templang = lang
+    templang = lang_check(interaction.locale)
     embed = nextcord.Embed(title=templang['PING']['embed_title'], description=templang['PING']['embed_description'].format(round(client.latency * 1000)), color=nextcord.Color.green())
     await interaction.response.send_message(embed=embed, ephemeral=True)
-
 
 #invite command
 @client.slash_command(name=lang['INVITE']['name'], description=lang['INVITE']['description'], dm_permission=True)
