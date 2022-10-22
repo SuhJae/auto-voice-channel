@@ -5,7 +5,7 @@ import time
 
 import nextcord
 import redis
-from nextcord import Interaction
+from nextcord import Interaction, Locale
 from nextcord.ext import commands
 
 # load config & language
@@ -13,6 +13,12 @@ config = configparser.ConfigParser()
 config.read('config.ini')
 lang = configparser.ConfigParser()
 lang.read('language.ini')
+english = configparser.ConfigParser()
+english.read('language/en_us.ini')
+korean = configparser.ConfigParser()
+korean.read('language/ko_kr.ini')
+chinese = configparser.ConfigParser()
+chinese.read('language/zh_cn.ini')
 
 token = config['CREDENTIALS']['token']
 owner_id = str(config['CREDENTIALS']['owner_id'])
@@ -27,6 +33,9 @@ db = config['REDIS']['db']
 
 # check config
 error_count = 0
+
+TESTING_GUILD_ID = 1023440388352114749
+
 
 if len(prefix) > 1:
     print('Error: Prefix must be only one character.')
@@ -299,9 +308,28 @@ async def help(interaction: Interaction,
 
 
 #ping command
-@client.slash_command(name=lang['PING']['name'], description=lang['PING']['description'], dm_permission=True)
+@client.slash_command(name=lang['PING']['name'], description=lang['PING']['description'], dm_permission=True, guild_ids=[TESTING_GUILD_ID],
+                      name_localizations={
+                          Locale.en_US: lang['PING']['name'],
+                          Locale.ko: lang['PING']['name'],
+                          Locale.zh_CN: lang['PING']['name']
+                      },
+                      description_localizations={
+                            Locale.en_US: lang['PING']['description'],
+                            Locale.ko: lang['PING']['description'],
+                            Locale.zh_CN: lang['PING']['description']
+                        })
 async def ping(interaction: Interaction):
-    embed = nextcord.Embed(title=lang['PING']['embed_title'], description=lang['PING']['embed_description'].format(round(client.latency * 1000)), color=nextcord.Color.green())
+    print(interaction.locale)
+    if interaction.locale == "en-US":
+        templang = english
+    elif interaction.locale == "ko":
+        templang = korean
+    elif interaction.locale == "zh-CN":
+        templang = chinese
+    else:
+        templang = lang
+    embed = nextcord.Embed(title=templang['PING']['embed_title'], description=templang['PING']['embed_description'].format(round(client.latency * 1000)), color=nextcord.Color.green())
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
