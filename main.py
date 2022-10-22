@@ -329,7 +329,6 @@ async def help(interaction: Interaction,
                             Locale.zh_CN: lang['PING']['description']
                         })
 async def ping(interaction: Interaction):
-    print(interaction.locale)
     templang = lang_check(interaction.locale)
     embed = nextcord.Embed(title=templang['PING']['embed_title'], description=templang['PING']['embed_description'].format(round(client.latency * 1000)), color=nextcord.Color.green())
     await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -337,7 +336,8 @@ async def ping(interaction: Interaction):
 #invite command
 @client.slash_command(name=lang['INVITE']['name'], description=lang['INVITE']['description'], dm_permission=True)
 async def invite(interaction: Interaction):
-    embed = nextcord.Embed(title=lang['INVITE']['embed_title'], description=lang['INVITE']['embed_description'], color=nextcord.Color.green())
+    templang = lang_check(interaction.locale)
+    embed = nextcord.Embed(title=templang['INVITE']['embed_title'], description=templang['INVITE']['embed_description'], color=nextcord.Color.green())
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
