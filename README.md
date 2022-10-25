@@ -70,7 +70,7 @@ Added multi-language support. Supports Korean, English, and Chinese. (More langu
 
 /clear - Delets all channels created by the bot. (In case of the bot going offline for a bit)
 
-/help - Shows a list of all commands or information about a specific command.
+/help `comand`- Shows a list of all commands or information about a specific command.
 
 /invite - Get the invite link of the bot. (Edit invite link at message.ini)
 
