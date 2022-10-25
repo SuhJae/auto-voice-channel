@@ -10,12 +10,17 @@
 
 This Discord bot will allow users to create auto voice channels without giving them edit channel permission. The bot will automatically generate a voice channel when the user joins the auto voice channel (previously set by the administrator). One of the most significant strengths is that this project uses Redis to store data, meaning swifter than using a traditional database and fully scalable in the future. Also, all of the messages are easily editable in [language.ini](https://github.com/HongWonYul/auto-voice-channel/blob/main/language.ini])
 
-* Offical Bot(Korean): [Invite](https://discord.com/api/oauth2/authorize?client_id=1024514599216746496&&permissions=17902608&scope=bot%20applications.commands)
+Also, this bot has a built-in dashboard that allows usr to easily manage the bot. (Not a web dashboard, but a dashboard in Discord using embeds and dropdowns.)
 
-## Newest Features - v.1.3.0
-Added dashboard so user can manage their auto voice channel settings using Discord native dropdown menu.
+### Offical Bot
+Supports Korean,English, and Chinese and hosted 24/7 on a blazing server. [Invite](https://discord.com/api/oauth2/authorize?client_id=852202202000578590&permissions=8&scope=bot%20applications.commands)
+
+If you are just looking for a bot to use, and doesn't want to host it yourself, this is the best option.
+
+## Newest Features - v.1.4.0
+Added multi-language support. Supports Korean, English, and Chinese. (More languages can be added easily by adding your own language file.) It utilizes the Discord user locale to determine the language. If the user locale is not supported, it will use the default language (which is stored in language.ini).
 <p align="left">
-  <img width="1020" src="media/new.png">
+  <img width="502" src="media/new2.png">
 </p>
 
 ## Requirments
@@ -70,3 +75,5 @@ Added dashboard so user can manage their auto voice channel settings using Disco
 /invite - Get the invite link of the bot. (Edit invite link at message.ini)
 
 /ping - Get the latency of the bot.
+
+/dashboard - Opens the dashboard.
