@@ -11,8 +11,8 @@ from nextcord.ext import commands
 # load config & language
 config = configparser.ConfigParser()
 config.read('config.ini')
-lang = configparser.ConfigParser()
-lang.read('language.ini')
+fallback_lang = configparser.ConfigParser()
+fallback_lang.read('language.ini')
 english = configparser.ConfigParser()
 english.read('language/en_us.ini')
 korean = configparser.ConfigParser()
@@ -87,7 +87,7 @@ def lang_check(locale):
     elif locale == "zh-CN":
         return chinese
     else:
-        return lang
+        return fallback_lang
 
 # Bot startup
 @client.event
@@ -114,17 +114,19 @@ async def on_ready():
 
 
 # create command
-@client.slash_command(name=lang['CREATE']['name'], description=lang['CREATE']['description'], dm_permission=False,
+@client.slash_command(name=fallback_lang['CREATE']['name'], description=fallback_lang['CREATE']['description'], dm_permission=False,
                       default_member_permissions=8)
 async def create_intro(interaction: Interaction,
                        channel: nextcord.VoiceChannel = nextcord.SlashOption(
-                           description=lang['CREATE']['argument_description'],
+                           description=fallback_lang['CREATE']['argument_description'],
                            required=True,
                        ),
                        ):
+    lang = lang_check(interaction.locale)
+
     try:
         if r.exists(f"auto:{channel.guild.id}:{channel.id}"):
-            embed = nextcord.Embed(title=lang['CREATE']['duplicate'],
+            embed = nextcord.Embed(title=fallback_lang['CREATE']['duplicate'],
                                    description=lang['CREATE']['duplicate_description'], color=nextcord.Color.yellow())
             await interaction.response.send_message(embed=embed, ephemeral=True)
         else:
@@ -141,14 +143,15 @@ async def create_intro(interaction: Interaction,
 
 
 # deactive command
-@client.slash_command(name=lang['DELETE']['name'], description=lang['DELETE']['description'], dm_permission=False,
+@client.slash_command(name=fallback_lang['DELETE']['name'], description=fallback_lang['DELETE']['description'], dm_permission=False,
                       default_member_permissions=8)
 async def delete_intro(interaction: Interaction,
                        channel: nextcord.VoiceChannel = nextcord.SlashOption(
-                           description=lang['DELETE']['argument_description'],
+                           description=fallback_lang['DELETE']['argument_description'],
                            required=True,
                        ),
                    ):
+    lang = lang_check(interaction.locale)
     try:
         if r.exists(f"auto:{channel.guild.id}:{channel.id}"):
             r.delete(f"auto:{channel.guild.id}:{channel.id}")
@@ -167,8 +170,9 @@ async def delete_intro(interaction: Interaction,
 
 
 # list command
-@client.slash_command(name=lang['LIST']['name'], description=lang['LIST']['description'], dm_permission=False)
+@client.slash_command(name=fallback_lang['LIST']['name'], description=fallback_lang['LIST']['description'], dm_permission=False)
 async def list_intro(interaction: Interaction):
+    lang = lang_check(interaction.locale)
     try:
         keys = r.keys(f"auto:{interaction.guild.id}:*")
         temp_keys = r.keys(f"temp:{interaction.guild.id}:*")
@@ -221,8 +225,9 @@ async def list_intro(interaction: Interaction):
 
 
 # clear command
-@client.slash_command(name=lang['CLEAR']['name'], description=lang['CLEAR']['description'], dm_permission=False, default_member_permissions=8)
+@client.slash_command(name=fallback_lang['CLEAR']['name'], description=fallback_lang['CLEAR']['description'], dm_permission=False, default_member_permissions=8)
 async def clear(interaction: Interaction):
+    lang = lang_check(interaction.locale)
     keys = r.keys(f"temp:{interaction.guild.id}:*")
     if len(keys) == 0:
         embed = nextcord.Embed(title=lang['CLEAR']['empty'],
@@ -258,14 +263,15 @@ async def clear(interaction: Interaction):
 
 
 # help command
-@client.slash_command(name=lang['HELP']['name'], description=lang['HELP']['description'], dm_permission=True)
+@client.slash_command(name=fallback_lang['HELP']['name'], description=fallback_lang['HELP']['description'], dm_permission=True)
 async def help(interaction: Interaction,
                 arg: str = nextcord.SlashOption(
-                    name=lang['HELP']['argument'],
-                    description=lang['HELP']['argument_description'],
+                    name=fallback_lang['HELP']['argument'],
+                    description=fallback_lang['HELP']['argument_description'],
                     required=False,
-                    choices=[lang['CREATE']['name'], lang['DELETE']['name'], lang['LIST']['name'], lang['CLEAR']['name'], lang['HELP']['name'], lang['INVITE']['name'], lang['PING']['name'], lang['DASHBOARD']['name']]
+                    choices=[fallback_lang['CREATE']['name'], fallback_lang['DELETE']['name'], fallback_lang['LIST']['name'], fallback_lang['CLEAR']['name'], fallback_lang['HELP']['name'], fallback_lang['INVITE']['name'], fallback_lang['PING']['name'], fallback_lang['DASHBOARD']['name']]
                 )):
+    lang = lang_check(interaction.locale)
     if arg == None:
         embed = nextcord.Embed(title=lang['HELP']['embed_title'], description=lang['HELP']['embed_description'],
                                color=nextcord.Color.green())
@@ -317,33 +323,24 @@ async def help(interaction: Interaction,
 
 
 #ping command
-@client.slash_command(name=lang['PING']['name'], description=lang['PING']['description'], dm_permission=True, guild_ids=[TESTING_GUILD_ID],
-                      name_localizations={
-                          Locale.en_US: lang['PING']['name'],
-                          Locale.ko: lang['PING']['name'],
-                          Locale.zh_CN: lang['PING']['name']
-                      },
-                      description_localizations={
-                            Locale.en_US: lang['PING']['description'],
-                            Locale.ko: lang['PING']['description'],
-                            Locale.zh_CN: lang['PING']['description']
-                        })
+@client.slash_command(name=fallback_lang['PING']['name'], description=fallback_lang['PING']['description'], dm_permission=True, guild_ids=[TESTING_GUILD_ID])
 async def ping(interaction: Interaction):
     templang = lang_check(interaction.locale)
     embed = nextcord.Embed(title=templang['PING']['embed_title'], description=templang['PING']['embed_description'].format(round(client.latency * 1000)), color=nextcord.Color.green())
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
 #invite command
-@client.slash_command(name=lang['INVITE']['name'], description=lang['INVITE']['description'], dm_permission=True)
+@client.slash_command(name=fallback_lang['INVITE']['name'], description=fallback_lang['INVITE']['description'], dm_permission=True)
 async def invite(interaction: Interaction):
-    templang = lang_check(interaction.locale)
-    embed = nextcord.Embed(title=templang['INVITE']['embed_title'], description=templang['INVITE']['embed_description'], color=nextcord.Color.green())
+    lang = lang_check(interaction.locale)
+    embed = nextcord.Embed(title=lang['INVITE']['embed_title'], description=lang['INVITE']['embed_description'], color=nextcord.Color.green())
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
 #dashboard command
-@client.slash_command(name=lang['DASHBOARD']['name'], description=lang['DASHBOARD']['description'], dm_permission=False, default_member_permissions=8)
+@client.slash_command(name=fallback_lang['DASHBOARD']['name'], description=fallback_lang['DASHBOARD']['description'], dm_permission=False, default_member_permissions=8)
 async def settings(interaction: Interaction):
+    lang = lang_check(interaction.locale)
     keys = r.keys(f"auto:{interaction.guild.id}:*")
     temp_keys = r.keys(f"temp:{interaction.guild.id}:*")
     embed = nextcord.Embed(title=lang['DASHBOARD']['embed_title'].format(interaction.guild.name), description=lang['DASHBOARD']['embed_description'], color=nextcord.Color.green())
@@ -407,8 +404,9 @@ async def on_guild_channel_delete(channel):
 # Class to handle the dropdown
 class Dropdown(nextcord.ui.Select):
     def __init__(self, options):
-        super().__init__(placeholder=lang['DROPDOWN']['placeholder'], options=options)
+        super().__init__(placeholder=fallback_lang['DROPDOWN']['placeholder'], options=options)
     async def callback(self, interaction: Interaction):
+        lang = lang_check(interaction.locale)
         if self.values[0] == 'clear':
             keys = r.keys(f"temp:{interaction.guild.id}:*")
             if len(keys) == 0:
@@ -575,18 +573,5 @@ class DropdownMenu(nextcord.ui.View):
         super().__init__()
         self.add_item(Dropdown(options))
 
-# @client.event
-# async def on_message(message):
-#     if message.author.bot:
-#         return
-#     if message.content.startswith(".l"):
-#         embed = nextcord.Embed(title="담화 도령 봇을 소개합니다!", description="담화 도령은 유저들이 필요할 때 **자신만의 음성 채널**을 만들 수 있게 해주는 봇 입니다! 기존 자동 음성 봇과 다른 **차세데 데이타 베이스**를 적용하여 빠른 속도와 안정성을 선사합니다! 또한, 봇에 대한 신뢰성을 위해 모든 코드를 자신있게 **오픈소스**로 공개하였습니다! 한번 <#978993126653952080> 음성 채널을 확인해 보세요!", color=nextcord.Color.green())
-#         embed.set_image(url="https://archive.cysub.net/bot.gif")
-#         embed.add_field(name="**초대**", value="`/초대` 명령어를 사용하거나 [여기](https://discord.com/api/oauth2/authorize?client_id=1024514599216746496&&permissions=17902608&scope=bot%20applications.commands)를 클릭하여 초대해 주세요!", inline=False)
-#         embed.add_field(name="**도움말**", value="`/도움말` 명령어를 사용하거나 [여기](https://github.com/HongWonYul/auto-voice-channel#commands)를 클릭하여 확인하세요!", inline=False)
-#         embed.add_field(name="**소스코드**", value="[여기서](https://github.com/HongWonYul/auto-voice-channel) 확인하세요!", inline=False)
-#
-#         await message.channel.send(embed=embed)
-#
 client.run(token)
 
