@@ -13,7 +13,7 @@ This Discord bot will allow users to create auto voice channels without giving t
 Also, this bot has a built-in dashboard that allows usr to easily manage the bot. (Not a web dashboard, but a dashboard in Discord using embeds and dropdowns.)
 
 ### Offical Bot
-Supports Korean,English, and Chinese and hosted 24/7 on a blazing server. [Invite](https://discord.com/api/oauth2/authorize?client_id=852202202000578590&permissions=8&scope=bot%20applications.commands)
+Supports Korean,English, and Chinese and hosted 24/7 on a dedicated server. [Invite](https://discord.com/api/oauth2/authorize?client_id=1024514599216746496&permissions=75792&scope=bot%20applications.commands)
 
 If you are just looking for a bot to use, and doesn't want to host it yourself, this is the best option.
 
