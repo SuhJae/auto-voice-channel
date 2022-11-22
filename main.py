@@ -8,6 +8,20 @@ import redis
 from nextcord import Interaction, Locale
 from nextcord.ext import commands
 
+# class for colored console output
+class BC:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    RESET = '\033[0m'
+
+sucess = f'{BC.OKGREEN}✓ {BC.RESET}'
+
 # load config & language
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -37,37 +51,38 @@ error_count = 0
 TESTING_GUILD_ID = 1023440388352114749
 
 if len(prefix) > 1:
-    print('Error: Prefix must be only one character.')
+    print(f'{BC.FAIL}Error: Prefix must be only one character.{BC.RESET}')
     error_count += 1
 
 if status not in ['online', 'idle', 'dnd', 'invisible']:
-    print('Error: Status must be one of online, idle, dnd, or invisible.')
+    print(f'{BC.FAIL}Error: Status must be one of online, idle, dnd, or invisible.{BC.RESET}')
     error_count += 1
 
 if status_type not in ['playing', 'streaming', 'listening', 'watching']:
-    print('Error: Status type must be one of playing, streaming, listening, or watching.')
+    print(f'{BC.FAIL}Error: Status type must be one of playing, streaming, listening, or watching.{BC.RESET}')
     error_count += 1
 
 if len(status_message) > 128:
-    print('Error: Status message must be less than 128 characters.')
+    print(f'{BC.FAIL}Error: Status message must be less than 128 characters.{BC.RESET}')
     error_count += 1
 
 if error_count > 0:
-    print('Please change the config file (config.ini) and try again.')
-    print('Exiting in 5 seconds...')
+    print(f'{BC.FAIL}Please change the config file (config.ini) and try again.\nExiting in 5 seconds...{BC.RESET}')
     time.sleep(5)
     exit()
 
+print(f'{sucess}Config check.')
+
 # check redis connection
 try:
-    print(f'Connecting to Redis... ({host}:{port} Database: {db})')
+    print(f'{sucess}Connecting to Redis. ({host}:{port} Database: {db})')
     r = redis.Redis(host=host, port=port, password=password, decode_responses=True, db=db)
     r.ping()
-    print(f"Connected to redis.")
+    print(f'{sucess}Redis database connection.')
 except:
-    print('Error: Could not connect to Redis server.')
-    print('Please change the config file (config.ini) and try again.')
-    print('Exiting in 5 seconds...')
+    print(f'''{BC.FAIL}Error: Could not connect to Redis server.
+Please change the config file (config.ini) and try again.
+Exiting in 5 seconds...''')
     time.sleep(5)
     exit()
 
@@ -106,11 +121,13 @@ async def on_ready():
         await client.change_presence(
             activity=nextcord.Activity(type=nextcord.ActivityType.watching, name=status_message), status=status)
     # print startup message
+    print(f'{sucess}Authentication to Discord.')
+
     owner_name = await client.fetch_user(owner_id)
     print('======================================')
-    print(f'Logged in as {client.user.name}#{client.user.discriminator} ({client.user.id})')
-    print(f"Owner: {owner_name} ({owner_id})")
-    print(f'Currenly running nextcord {nextcord.__version__} on python {platform.python_version()}')
+    print(f'Logged in as {BC.OKBLUE}{client.user.name}#{client.user.discriminator} {BC.RESET}({client.user.id})')
+    print(f"Owner: {BC.OKBLUE}{owner_name}{BC.RESET} ({owner_id})")
+    print(f'Currenly running nextcord {BC.OKBLUE}{nextcord.__version__}{BC.RESET} on python {BC.OKBLUE}{platform.python_version()}{BC.RESET}')
     print('======================================')
 
 
