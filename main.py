@@ -75,7 +75,7 @@ print(f'{sucess}Config check.')
 
 # check redis connection
 try:
-    print(f'{sucess}Connecting to Redis. ({host}:{port} Database: {db})')
+    print(f'{sucess}Connecting to Redis. ({BC.OKBLUE}{host}:{port}{BC.RESET} Database: {BC.OKBLUE}{db}{BC.RESET})')
     r = redis.Redis(host=host, port=port, password=password, decode_responses=True, db=db)
     r.ping()
     print(f'{sucess}Redis database connection.')
@@ -638,5 +638,12 @@ class DropdownMenu(nextcord.ui.View):
         super().__init__()
         self.add_item(Dropdown(options))
 
-
-client.run(token)
+try:
+    client.run(token)
+except(nextcord.errors.LoginFailure):
+    print(f'''{BC.FAIL}Error: Token is invalid.
+Please check the token in config file (config.ini) and try again.
+Exiting in 5 seconds...{BC.RESET}
+''')
+    time.sleep(5)
+    exit()
