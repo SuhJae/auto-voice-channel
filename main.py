@@ -436,19 +436,33 @@ async def on_voice_state_update(member, before, after):
     # if user leaves a voice channel
     if before.channel != None:
         if r.get(f"temp:{before.channel.guild.id}:{before.channel.id}") != None:
+            print(f'{BC.OKBLUE}{member}{BC.RESET} has left temp channel {BC.OKBLUE}{before.channel}{BC.RESET}(ID: {BC.OKBLUE}{before.channel.id}{BC.RESET})')
             if len(before.channel.members) == 0:
-                await before.channel.delete()
-                r.delete(f"temp:{before.channel.guild.id}:{before.channel.id}")
+                try:
+                    await before.channel.delete()
+                    r.delete(f"temp:{before.channel.guild.id}:{before.channel.id}")
+                    print(f'{BC.OKBLUE}{before.channel}{BC.RESET}(ID: {BC.OKBLUE}{before.channel.id}{BC.RESET}) has been deleted because it is empty.')
+                except:
+                    print(f'{BC.WARNING}Failed to delete {BC.OKBLUE}{before.channel}{BC.WARNING}.')
 
     # if user joins / transfers to a voice channel
     if after.channel != None:
         if r.get(f"auto:{after.channel.guild.id}:{after.channel.id}") != None:
+            print(f'{BC.OKBLUE}{member}{BC.RESET} has joined auto channel {BC.OKBLUE}{after.channel}{BC.RESET}(ID: {BC.OKBLUE}{after.channel.id}{BC.RESET})')
             category = after.channel.category
             overwrites = {member: nextcord.PermissionOverwrite(manage_channels=True)}
-            new_channel = await after.channel.guild.create_voice_channel(name=member.display_name, category=category,
-                                                                         overwrites=overwrites)
-            r.set(f"temp:{after.channel.guild.id}:{new_channel.id}", after.channel.id)
-            await member.move_to(new_channel)
+            try:
+                new_channel = await after.channel.guild.create_voice_channel(name=member.display_name, category=category,
+                                                                             overwrites=overwrites)
+                r.set(f"temp:{after.channel.guild.id}:{new_channel.id}", after.channel.id)
+                print(f'Created temp channel {BC.OKBLUE}{new_channel}{BC.RESET}(ID: {BC.OKBLUE}{new_channel.id}{BC.RESET})')
+            except:
+                print(f'{BC.WARNING}Failed to create temp channel for {BC.OKBLUE}{member}{BC.WARNING}.')
+            try:
+                await member.move_to(new_channel)
+                print(f'Moved {BC.OKBLUE}{member}{BC.RESET} to temp channel {BC.OKBLUE}{new_channel}{BC.RESET}(ID: {BC.OKBLUE}{new_channel.id}{BC.RESET})')
+            except:
+                print(f'{BC.WARNING}Failed to move {BC.OKBLUE}{member}{BC.WARNING} to temp channel {BC.OKBLUE}{new_channel}{BC.RESET}(ID: {BC.OKBLUE}{new_channel.id}{BC.RESET})')
 
 
 # when voice channel is deleted
