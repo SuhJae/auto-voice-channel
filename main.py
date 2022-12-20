@@ -48,8 +48,6 @@ db = config['REDIS']['db']
 # check config
 error_count = 0
 
-TESTING_GUILD_ID = 1023440388352114749
-
 if len(prefix) > 1:
     print(f'{BC.FAIL}Error: Prefix must be only one character.{BC.RESET}')
     error_count += 1
@@ -372,7 +370,7 @@ async def help(interaction: Interaction,
 
 # ping command
 @client.slash_command(name=fallback_lang['PING']['name'], description=fallback_lang['PING']['description'],
-                      dm_permission=True, guild_ids=[TESTING_GUILD_ID])
+                      dm_permission=True)
 async def ping(interaction: Interaction):
     templang = lang_check(interaction.locale)
     embed = nextcord.Embed(title=templang['PING']['embed_title'],
