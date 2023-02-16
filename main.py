@@ -36,7 +36,6 @@ chinese.read('language/zh_cn.ini')
 
 token = config['CREDENTIALS']['token']
 owner_id = str(config['CREDENTIALS']['owner_id'])
-prefix = config['SETTINGS']['prefix']
 status = config['SETTINGS']['status']
 status_message = config['SETTINGS']['status_message']
 status_type = config['SETTINGS']['status_type']
@@ -47,10 +46,6 @@ db = config['REDIS']['db']
 
 # check config
 error_count = 0
-
-if len(prefix) > 1:
-    print(f'{BC.FAIL}Error: Prefix must be only one character.{BC.RESET}')
-    error_count += 1
 
 if status not in ['online', 'idle', 'dnd', 'invisible']:
     print(f'{BC.FAIL}Error: Status must be one of online, idle, dnd, or invisible.{BC.RESET}')
@@ -89,7 +84,7 @@ intents = nextcord.Intents.default()
 intents.members = True
 intents.message_content = True
 
-client = commands.Bot(command_prefix=prefix, intents=intents)
+client = commands.Bot(intents=intents)
 
 
 def lang_check(locale):
